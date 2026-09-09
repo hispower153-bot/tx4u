@@ -1,11 +1,291 @@
-<div class="result" id="result">
-    <h2>📊 계산 결과</h2>
-    <div class="row"><span>총 근무일수</span><b id="rDays">-</b></div>
-    <div class="row"><span>1일 평균임금 (추정)</span><b id="rAvg">-</b></div>
-    <div class="row"><span>예상 퇴직금 (세전)</span><b id="rSeverance">-</b></div>
-    <div class="row"><span>예상 퇴직소득세</span><b id="rTax">-</b></div>
-    <div class="row total"><span>세후 실수령액</span><b id="rNet">-</b></div>
-    <p class="note">* 평균임금은 단순화하여 월급÷30으로 계산했습니다. 실제로는 퇴직 전 3개월 임금총액÷3개월 총일수로 산정되며, 연장·야간수당 등이 포함되면 더 높아질 수 있습니다.<br>
-        * 퇴직소득세는 근속연수별 공제 및 2025년 세율(과표 1,400만 이하 6% 등)을 적용한 추정치입니다. 정확한 세액은 회사 정산서를 확인하세요.<br>
-        * 본 계산 결과는 참고용이며 법적 효력을 갖지 않습니다.</p>
-</div>
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퇴직금 계산기 - 퇴직금 &amp; 퇴직소득세 한번에 계산 | TX4U</title>
+    <meta name="description" content="재직일수와 월급만 입력하면 퇴직금과 퇴직소득세, 세후 실수령액을 자동 계산합니다. 무료 퇴직금 계산기 TX4U.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            background: #f5f7fa;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f172a;
+            color: #fff;
+            padding: 16px 24px;
+        }
+
+        header .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        header .logo span {
+            color: #fff;
+        }
+
+        .wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 16px 0 8px;
+        }
+
+        .sub {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin: 14px 0 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: #0ea5e9;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0284c7;
+        }
+
+        .result {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .result h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 15px;
+        }
+
+        .row b {
+            font-size: 17px;
+        }
+
+        .total {
+            background: #f0f9ff;
+            border-radius: 10px;
+            padding: 14px 12px;
+            margin-top: 8px;
+        }
+
+        .total b {
+            color: #0369a1;
+            font-size: 20px;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 32px 16px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">TX<span>4U</span> 퇴직금 계산기</div>
+    </header>
+
+    <div class="wrap">
+        <h1>퇴직금 · 세후 실수령액 계산</h1>
+        <p class="sub">입사일과 월급만 입력하면 퇴직금과 퇴직소득세까지 한 번에 계산됩니다.</p>
+
+        <div class="card">
+            <label>입사일</label>
+            <input type="date" id="inDate" value="2020-01-01">
+            <label>퇴사일</label>
+            <input type="date" id="outDate">
+            <label>월급 (세전, 원)</label>
+            <input type="text" id="salary" placeholder="예: 3000000" inputmode="numeric">
+            <button onclick="calc()">계산하기</button>
+
+            <div class="result" id="result">
+                <h2>📊 계산 결과</h2>
+                <div class="row"><span>총 근무일수</span><b id="rDays">-</b></div>
+                <div class="row"><span>1일 평균임금 (추정)</span><b id="rAvg">-</b></div>
+                <div class="row"><span>예상 퇴직금 (세전)</span><b id="rSeverance">-</b></div>
+                <div class="row"><span>예상 퇴직소득세</span><b id="rTax">-</b></div>
+                <div class="row total"><span>세후 실수령액</span><b id="rNet">-</b></div>
+                <p class="note">
+                    * 평균임금은 단순화하여 월급÷30으로 계산했습니다. 실제로는 퇴직 전 3개월 임금총액 ÷ 3개월 총일수로 산정되며 연장·야간수당이 포함되면 더 높아질 수 있습니다.<br>
+                    * 퇴직소득세는 근속연수별 공제와 세율을 적용한 추정치입니다. 정확한 세액은 회사 퇴직소득 지급명세서를 확인하세요.<br>
+                    * 본 계산 결과는 참고용이며 법적 효력을 갖지 않습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 style="font-size:18px; margin-bottom:12px;">📌 퇴직금 계산 방법 (근로기준법)</h2>
+            <p style="font-size:15px; line-height:1.8; color:#475569;">
+                퇴직금 = <b>1일 평균임금 × 30일 × (재직일수 ÷ 365)</b><br><br>
+                · 1년 이상 근무 시 퇴직금 지급 의무가 발생합니다.<br>
+                · 평균임금 = 퇴직일 이전 3개월간 임금총액 ÷ 3개월 총일수<br>
+                · 퇴직금은 퇴직일로부터 <b>14일 이내</b> 지급이 원칙입니다.
+            </p>
+        </div>
+    </div>
+
+    <footer>© 2025 TX4U · 퇴직금·세금 정보 사이트</footer>
+
+    <script>
+        function fmt(n) {
+            return Math.round(n).toLocaleString('ko-KR') + '원';
+        }
+
+        // 퇴직소득세 간이 계산
+        function retireTax(severance, years) {
+            var y = Math.min(20, years);
+
+            // 근속연수별 소득공제
+            var ded;
+            if (y <= 1) {
+                ded = 5000000;
+            } else if (y <= 4) {
+                ded = 5000000 + 1575000 * (y - 1);
+            } else {
+                ded = 5000000 + 1575000 * 3 + 1950000 * (y - 4);
+            }
+
+            var base = Math.max(0, severance - ded);
+
+            // 근속연수별 환산급여
+            var divisor = (y <= 5) ? 5 : (y <= 10) ? 3 : (y <= 20) ? 2 : 1;
+            var pb = base / divisor;
+
+            // 환산급여에 누진세율 적용
+            var tax;
+            if (pb <= 14000000) {
+                tax = pb * 0.06;
+            } else if (pb <= 50000000) {
+                tax = 840000 + (pb - 14000000) * 0.15;
+            } else if (pb <= 88000000) {
+                tax = 6240000 + (pb - 50000000) * 0.24;
+            } else if (pb <= 150000000) {
+                tax = 15360000 + (pb - 88000000) * 0.35;
+            } else if (pb <= 300000000) {
+                tax = 37060000 + (pb - 150000000) * 0.38;
+            } else if (pb <= 500000000) {
+                tax = 94060000 + (pb - 300000000) * 0.40;
+            } else if (pb <= 1000000000) {
+                tax = 174060000 + (pb - 500000000) * 0.42;
+            } else {
+                tax = 384060000 + (pb - 1000000000) * 0.45;
+            }
+
+            // 근속연수별 세액환산
+            tax = tax * divisor;
+
+            // 세액의 70% (1000만원 초과분은 60%) + 최저세율 0.6% 비교
+            var reduced = (severance <= 00000) ? tax * 0.7 : severance * 0.07 * 0.6 + Math.max(0, tax - severance * 0.07) * 0.7;
+            tax = Math.min(tax, Math.max(reduced, severance * 0.006));
+
+            return Math.max(0, tax);
+        }
+
+        function calc() {
+            var inStr = document.getElementById('inDate').value;
+            var outStr = document.getElementById('outDate').value;
+            var salary = parseInt(document.getElementById('salary').value.replace(/[^0-9]/g, ''), 10);
+
+            if (!inStr || !outStr || !salary) {
+                alert('모든 항목을 입력해주세요.');
+                return;
+            }
+
+            var inD = new Date(inStr);
+            var outD = new Date(outStr);
+
+            if (outD <= inD) {
+                alert('퇴사일은 입사일 이후여야 합니다.');
+                return;
+            }
+
+            var days = Math.floor((outD - inD) / 86400000) + 1;
+            var years = Math.floor(days / 365);
+            var avgDaily = salary / 30;
+            var severance = avgDaily * 30 * (days / 365);
+            var hasSeverance = days >= 365;
+            var tax = hasSeverance ? retireTax(severance, years) : 0;
+            var net = severance - tax;
+
+            document.getElementById('rDays').textContent = days.toLocaleString('ko-KR') + '일 (' + years + '년 ' + (Math.floor((days % 365) / 30)) + '개월)';
+            document.getElementById('rAvg').textContent = fmt(avgDaily);
+            document.getElementById('rSeverance').textContent = fmt(severance);
+            document.getElementById('rTax').textContent = hasSeverance ? '-' + fmt(tax) : '해당없음 (1년 미만)';
+            document.getElementById('rNet').textContent = fmt(net);
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 퇴사일 기본값 = 오늘
+        document.getElementById('outDate').value = new Date().toISOString().slice(0, 10);
+    </script>
+</body>
+
+</html>
