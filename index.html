@@ -145,6 +145,13 @@
             font-size: 13px;
         }
     </style>
+    <style>
+        footer a {
+            color: #0ea5e9;
+            text-decoration: none;
+            margin: 0 4px;
+        }
+    </style>
 </head>
 
 <body>
@@ -191,7 +198,11 @@
         </div>
     </div>
 
-    <footer>© 2025 TX4U · 퇴직금·세금 정보 사이트</footer>
+    <footer>
+        <a href="/">계산기</a> | <a href="/about.html">사이트 소개</a> | <a href="/privacy.html">개인정보처리방침</a>
+        <br><br>© 2025 TX4U · 퇴직금·세금 정보 사이트
+    </footer>
+
 
     <script>
         function fmt(n) {
@@ -242,7 +253,7 @@
             tax = tax * divisor;
 
             // 세액의 70% (1000만원 초과분은 60%) + 최저세율 0.6% 비교
-            var reduced = (severance <= 00000) ? tax * 0.7 : severance * 0.07 * 0.6 + Math.max(0, tax - severance * 0.07) * 0.7;
+            var reduced = (severance <= 10000000) ? tax * 0.7 : severance * 0.07 * 0.6 + Math.max(0, tax - severance * 0.07) * 0.7;
             tax = Math.min(tax, Math.max(reduced, severance * 0.006));
 
             return Math.max(0, tax);
